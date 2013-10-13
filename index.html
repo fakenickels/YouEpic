@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>YouEpic</title>
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+</head>
+<body>
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+	// init the FB JS SDK
+	FB.init({
+	  appId      : '539140359445688',                        // App ID from the app dashboard
+	 // channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel file for x-domain comms
+	  status     : true,                                 // Check Facebook Login status
+	  xfbml      : true                                  // Look for social plugins on the page
+	});
+
+	// Additional initialization code such as adding Event Listeners goes here
+  };
+
+  // Load the SDK asynchronously
+  (function(d, s, id){
+	 var js, fjs = d.getElementsByTagName(s)[0];
+	 if (d.getElementById(id)) {return;}
+	 js = d.createElement(s); js.id = id;
+	 js.src = "http://connect.facebook.net/en_US/all.js";
+	 fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>	
+	<div id='container'>
+		<div class='title'>
+			<h1>Acompanhe a sua epicidade</h1>
+		</div>
+		<div>
+			<h2>Insira as URLs que você quer acompanhar</h2>
+			<form id='urls-form'>
+				<input type='text' id='form-url-1'/> <button type='button' ref-url='1'>ok</button><br/>
+				<button type='button' id='add-url'>Mais uma URL</button>
+			</form>
+		</div>
+	</div>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script type="text/javascript" src='js/main.js'></script>	
+</body>
+</html>
