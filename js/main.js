@@ -10,17 +10,23 @@ $(function(){
 		$('button[type=submit]', this).addClass('disabled').text('Aguarde...');
 
 		forceLogin(function( response ){
+			console.log('forceLogin called');
 			if( response == 'ok' ){
 				var urls = inputsField.find('input').vals(), 
-					total = ursl.length-1,
+					total = urls.length-1,
 					comments = [];
 
 				$.each(urls, function(i, url){
 					var urlID = parseObjID(url);
 
+					//TODO: Check a other user [user friend] comments too 
+					console.log('preparing to get comments from ' + urlID);
+					console.log('total ' + total)
 					getComments(urlID, null, function(data){
-						comments.concat(data);
+						console.log('parsing comments from ' + urlID, 'id ' + i)
+						comments = comments.concat(data);
 
+						console.log('Am I here?');
 						if( i == total)
 							showComments( comments );
 					});
@@ -35,18 +41,22 @@ $(function(){
 
 	$('button.url-remove-btn', form).click(function(){
 		$(this).parent().remove();
-		console.log('?')
 	});
 
 	function showComments( comments ){
+		console.log('preparing to show commments');
+		console.log(comments);
+		$('button[type=submit]', this).text('Pronto');
 		$.each( comments, function(i, comment){
-			var div = '<div class="comment">';
-				div += '<p class"lead">' + comment.message + '</p>';
-				div += '<p>'+ comment.likes +'Likes</p>';
-				div += '<p>'+ comment.comment_count +' replies</p>';
+			//TODO: Finish this later. Okay?
+			var div = '<div class="comment well">';
+				div += '<h3>' + comment.text + '</h3>';
+				div += '<p class="lead">'+ comment.likes +' Likes</p>';
+				div += '<p class="lead">'+ comment.comment_count +'  replies</p>';
 				div += '</div>';
 
 			div = $(div);
+			console.log(div);
 
 			div.appendTo(commentsBox);
 		});
@@ -93,10 +103,12 @@ $(function(){
 			userID = userID || FB.getUserID();
 
 			$.each(data, function(i, obj){
+				console.log( 'validating user ' + (obj.fromid == userID) )
 				if( obj.fromid == userID )
 					userComments.push( obj );
 			});
 
+			console.log(userComments)
 			fn( userComments );
 		})
 	}
@@ -123,7 +135,7 @@ $(function(){
 		var vals = [];
 
 		$(this).each(function(){
-			val.push( $(this).val() );
+			vals.push( $(this).val() );
 		});
 
 		return vals;
