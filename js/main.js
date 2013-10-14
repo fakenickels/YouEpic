@@ -65,7 +65,7 @@ $(function(){
 				$('#photos-watcher .progress').toggleClass('active');
 				MG.forceLogin(function(){
 					MG.getUserPhotos( 5, function(data){
-						MG.showPhotos(data['data'], function(){
+						MG.showPhotos(data, function(){
 							$('#photos-watcher .progress').toggleClass('active');
 						})
 					});
@@ -166,11 +166,13 @@ $(function(){
 
 		getUserPhotos: function(limit, fn){
 			limit = limit | 3;
+			 
 			var query = 'SELECT pid, caption, link, like_info, src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE owner = me() ) ORDER BY like_info.like_count DESC LIMIT 0,' + limit;
 			FB.api({
 				method: 'fql.query',
 				query: query
 			}, function(data){
+				console.log('')
 				fn(data);
 			});
 		},		
