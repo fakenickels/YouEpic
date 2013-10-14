@@ -36,22 +36,53 @@
    }(document, 'script', 'facebook-jssdk'));
 </script>	
 	<div id='container' class='container'>
-		<div class='title'>
-			<h1>Acompanhe a sua epicidade</h1>
+		<div class='site-name jumbotron'>
+			<h1>Moleque Gaiato</h1>
 		</div>
-		<div id='form-field'>
-			<p class='lead muted'>Insira as URLs que você quer acompanhar</p>
-			<form id='urls-form' role='form'>
-				<div id='inputs-field'>
-					<div class='form-group'>
-						<input type='url' class='form-control' name='form-url-1' placeholder='http://facebook.com/something-else'/> 
-						<button type='button' ref-url='1' class='btn btn-danger url-remove-btn'>remover</button>
+		
+		<div class='tabs'>
+			
+			<ul id='tab-menu' class='nav nav-tabs'>
+				<li class='active'>
+					<a href="#comments-watcher" data-toggle='tab'>Acompanhe seus comentários em postagens</a>
+				</li>
+
+				<li>
+					<a href="#status-watcher" data-toggle='tab'>Ver meu status mais curtidos</a>
+				</li>
+
+				<li>
+					<a href="#photos-watcher" data-toggle='tab'>Ver minhas fotos mais curtidas</a>
+				</li>
+			</ul>
+
+			<div id='tab-menu-content' class='tab-content'>
+				<div class='tab-pane fade active in' id='comments-watcher'>
+					<div class='title'>
+						<h1>Acompanhe a sua gaiatice</h1>
+					</div>
+					<div id='form-field'>
+						<p class='lead muted'>Insira as URLs que você quer acompanhar</p>
+						<form id='urls-form' role='form'>
+							<div id='inputs-field'>
+								<div class='form-group well'>
+									<input type='url' class='form-control' name='form-url-1' placeholder='http://facebook.com/something-else'/><br/> 
+									<button type='button' ref-url='1' class='btn btn-danger url-remove-btn'>remover</button>
+								</div>
+							</div>
+							<button type='button' id='add-url' class='btn btn-success'>Mais uma URL</button> | 
+							<button type='submit' class='btn btn-large btn-primary'>Pronto</button>
+						</form>
 					</div>
 				</div>
-				<button type='button' id='add-url' class='btn btn-success'>Mais uma URL</button><br/>
-				<button type='submit' class='btn btn-large btn-primary'>Pronto</button>
-			</form>
+
+				<div class='tab-pane fade' id='status-watcher'>Oi, caba</div>
+
+				<div class='tab-pane fade' id='photos-watcher'></div>
+
+			</div>
 		</div>
+
 		<div id='comments-box'>
 
 		</div>
