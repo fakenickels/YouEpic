@@ -182,8 +182,12 @@ $(function(){
 			$.each( photos, function(i, photo){
 				var div = '<div class="photo well">';
 					div += '<img src="'+ photo.src_big +'" />'
-					div += '<p class="lead">Curtidas ' + photos.like_info.like_count + '<p>';
+					div += '<p class="lead">Curtidas ' + photo.like_info.like_count + '<p>';
 					div += '</div>';
+
+				div = $(div);
+
+				div.appendTo(photosBox);
 			});
 
 			fn();
