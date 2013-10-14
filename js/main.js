@@ -65,7 +65,7 @@ $(function(){
 				$('#photos-watcher .progress').toggleClass('active');
 				MG.forceLogin(function(){
 					MG.getUserPhotos( 5, function(data){
-						MG.showPhotos(data, function(){
+						MG.showPhotos(data['data'], function(){
 							$('#photos-watcher .progress').toggleClass('active');
 						})
 					});
