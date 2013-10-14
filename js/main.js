@@ -60,7 +60,8 @@ $(function(){
 			// end of #comments-watcher
 			// #photos-watcher
 
-			$('#photos-watcher').bind('click', function(){
+			$('a[href=#photos-watcher]').bind('click', function(){
+				console.log('#photos-watcher!');
 				MG.forceLogin(function(){
 					MG.getUserPhotos( MG.showPhotos );
 				});
@@ -214,6 +215,8 @@ $(function(){
 	}
 
 	MG.init();
+
+	window.MG = MG;
 
 	$.fn.vals = function( filter ){
 		var vals = [];
