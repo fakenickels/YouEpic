@@ -63,7 +63,11 @@ $(function(){
 			$('a[href=#photos-watcher]').bind('click', function(){
 				console.log('#photos-watcher!');
 				MG.forceLogin(function(){
-					MG.getUserPhotos( MG.showPhotos );
+					MG.getUserPhotos( 5, function(data){
+						MG.showPhotos(data, function(){
+							$('#photos-watcher .progress').removeClass('active');
+						})
+					});
 				});
 			});
 		},
@@ -114,6 +118,7 @@ $(function(){
 			return id[0]; 
 		},
 
+		//TODO: make MG#getComments support data paging
 		getComments: function( objID, userID, fn ){
 			var fql = 'SELECT fromid, likes, time, comment_count, post_id_cursor, text FROM comment WHERE post_id = $id';
 				fql = fql.replace('$id', objID);
@@ -169,7 +174,7 @@ $(function(){
 			});
 		},		
 
-		showPhotos: function( photos ){
+		showPhotos: function( photos, fn ){
 			console.log('preparing to show photos');
 			console.log(photos);
 
@@ -179,6 +184,8 @@ $(function(){
 					div += '<p class="lead">Curtidas ' + photos.like_info.like_count + '<p>';
 					div += '</div>';
 			});
+
+			fn();
 		},
 
 		checkLogin: function(fns){
