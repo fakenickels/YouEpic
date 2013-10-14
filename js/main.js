@@ -41,7 +41,7 @@ $(function(){
 								// At last, can show user comments [because AJAX can be slooow]
 								if( i == total){
 									MG.showComments( comments );
-									actionBtn.removeClass('disabled').text('Pronto');
+									actionBtn.toggleClass('disabled').text('Pronto');
 								}
 							});
 						})
@@ -62,10 +62,11 @@ $(function(){
 
 			$('a[href=#photos-watcher]').bind('click', function(){
 				console.log('#photos-watcher!');
+				$('#photos-watcher .progress').toggleClass('active');
 				MG.forceLogin(function(){
 					MG.getUserPhotos( 5, function(data){
 						MG.showPhotos(data, function(){
-							$('#photos-watcher .progress').removeClass('active');
+							$('#photos-watcher .progress').toggleClass('active');
 						})
 					});
 				});
@@ -168,7 +169,7 @@ $(function(){
 			var query = 'SELECT pid, caption, link, like_info, src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE owner = me() ) ORDER BY like_info.like_count DESC LIMIT 0,' + limit;
 			FB.api({
 				method: 'fql.query',
-				sql: query
+				query: query
 			}, function(data){
 				fn(data);
 			});
