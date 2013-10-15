@@ -245,7 +245,8 @@ $(function(){
 				error: function(){
 					fn('error');
 					FB.login(function(){
-						checkLogin();
+						// Reload it
+						MG.checkLogin();
 					}, {scope: 'user_photos,user_videos,user_status,friends_photos'});
 				}
 			});		
