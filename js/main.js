@@ -25,27 +25,32 @@ $(function(){
 					if( response == 'ok' ){
 						var urls = inputsField.find('input').vals(), 
 							total = urls.length-1,
-							comments = [];
+							posts = [];
 
 
 						$.each(urls, function(i, url){
-							var urlID = MG.parseObjID(url);
+							var urlID = MG.parseObjID(url), 
+								arrForThis = undefined;
 
 							//TODO: Check a other user [user friend] comments too 
 							console.log('preparing to get comments from ' + urlID);
 							console.log('total (counting from zero) == ' + total)
 							MG.getComments(urlID, null, function(data){
 								console.log('parsing comments from ' + urlID, 'index ' + i)
-								comments = comments.concat(data);
+								arrForThis = data;
+								arrForThis.urlID = urlID;
 
+								posts.push( arrForThis );
 								// At last, can show user comments [because AJAX can be slooow]
 								if( i == total){
-									MG.showComments( comments );
+									MG.showComments( posts );
 									actionBtn.toggleClass('disabled').text('Pronto');
 								}
 							});
 						})
 					}
+				}, function(){
+					alert('Recarregue a página');
 				})
 			});
 
@@ -69,6 +74,8 @@ $(function(){
 							$('#photos-watcher .progress').toggleClass('active');
 						})
 					});
+				}, function(){
+					alert('Que tal recarregar a página?')
 				});
 			});
 		},
@@ -81,16 +88,23 @@ $(function(){
 
 			addURL: function( url ){
 				var obj = JSON.parse(localStorage.MeninoGaiato);
+				if( url.constructor === Array )
 					obj.urls.push(url);
+				else 
+					obj.urls = obj.urls.concat(url);
+
 				localStorage.MeninoGaiato = JSON.stringify(obj);
 			},
 
 			delURL: function( url ){
 				var obj = JSON.parse(localStorage.MeninoGaiato), newArr = [];
 
-				$.each(obj.urls, function(i, url){
-					
-				})
+				$.each(obj.urls, function(i, u){
+					if( url != u ) newArr.push(u)
+				});
+
+				obj.urls = newArr;
+				localStorage.MeninoGaiato = JSON.stringify( obj );
 			} 
 		},
 
@@ -143,24 +157,27 @@ $(function(){
 			})
 		},
 
-		showComments: function( comments ){
+		showComments: function( posts ){
 			console.log('preparing to show commments');
-			console.log(comments);
+			console.log(posts);
 
-			comments = MG.sortBy('likes', comments);
-
-			$.each( comments, function(i, comment){
+			$.each( post, function(i, post){
 				//TODO: Finish this later. Okay?
 				//TODO: Use templates
-				var div = '<div class="comment well">';
-					div += '<h3>' + comment.text + '</h3>';
-					div += '<p class="lead">'+ comment.likes +' Likes</p>';
-					div += '<p class="lead">'+ comment.comment_count +'  replies</p>';
-					div += '</div>';
+				var postDiv = $('<div class="post"><h3>post #' + post.urlID + '</h3></div>');
+					postDiv.appendTo(commentsBox);
 
-				div = $(div);
+				$.each(post, function( i, comment){
+					var div = '<div class="comment well">';
+						div += '<h3>' + comment.text + '</h3>';
+						div += '<p class="lead">'+ comment.likes +' Likes</p>';
+						div += '<p class="lead">'+ comment.comment_count +'  replies</p>';
+						div += '</div>';
 
-				div.appendTo(commentsBox);
+					div = $(div);
+
+					div.appendTo(postDiv);
+				});
 			});
 		},
 
@@ -221,7 +238,7 @@ $(function(){
 			var sortedArr;
 
 			sortedArr = objsArr.sort(function( a, b ){
-				return a[key] > b[key];
+				return a[key] < b[key];
 			});
 
 			return sortedArr;
