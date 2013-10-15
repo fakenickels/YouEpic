@@ -231,8 +231,12 @@ $(function(){
 		checkLogin: function(fns){
 			var status = '';
 			FB.getLoginStatus(function(status){
-				if(status.status == 'connected') fns.success();
-				else fns.error();
+				if(status.status == 'connected'){ 
+					if( fns.success ) fns.success();
+				}
+				else {
+					if( fns.error ) fns.error();
+				}
 			})
 		},
 
