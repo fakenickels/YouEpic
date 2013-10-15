@@ -23,6 +23,8 @@ $(function(){
 				MG.forceLogin(function( response ){
 					console.log('forceLogin called');
 					if( response == 'ok' ){
+
+						commentsBox.cleanup();
 						var urls = inputsField.find('input').vals(), 
 							total = urls.length-1,
 							posts = [];
@@ -49,9 +51,7 @@ $(function(){
 							});
 						})
 					}
-				}, function(){
-					alert('Recarregue a página');
-				})
+				});
 			});
 
 			$('#add-url').click(function(){
@@ -67,15 +67,21 @@ $(function(){
 
 			$('a[href=#photos-watcher]').bind('click', function(){
 				console.log('#photos-watcher!');
+				$('#photos-watcher').cleanup();
 				$('#photos-watcher .progress').toggleClass('active');
-				MG.forceLogin(function(){
-					MG.getUserPhotos( 5, function(data){
-						MG.showPhotos(data, function(){
-							$('#photos-watcher .progress').toggleClass('active');
-						})
-					});
-				}, function(){
-					alert('Que tal recarregar a página?')
+				MG.forceLogin(function(response){
+					if( response == 'ok' ){
+						var userID = undefined;
+						if( location.href.indexOf('?u=') > -1 ){
+							userID = location.href.split('?u=')[1];
+						}
+
+						MG.getUserPhotos( 5, function(data){
+							MG.showPhotos(data, function(){
+								$('#photos-watcher .progress').toggleClass('active');
+							})
+						}, userID);
+					}
 				});
 			});
 		},
@@ -181,15 +187,16 @@ $(function(){
 			});
 		},
 
-		getUserPhotos: function(limit, fn){
-			limit = limit | 3;
+		getUserPhotos: function(limit, fn, userID){
+			limit = limit || 3;
+			userID = userID || FB.getUserID();
 			 
-			var query = 'SELECT pid, caption, link, like_info, src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE owner = me() ) ORDER BY like_info.like_count DESC LIMIT 0,' + limit;
+			var query = 'SELECT pid, caption, link, like_info, comment_info,src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE owner = '+ userID +' ) ORDER BY like_info.like_count DESC LIMIT 0,' + limit;
 			FB.api({
 				method: 'fql.query',
 				query: query
 			}, function(data){
-				console.log('')
+				console.log(data)
 				fn(data);
 			});
 		},		
@@ -199,9 +206,15 @@ $(function(){
 			console.log(photos);
 
 			$.each( photos, function(i, photo){
-				var div = '<div class="photo well">';
-					div += '<img src="'+ photo.src_big +'" />'
-					div += '<p class="lead">Curtidas ' + photo.like_info.like_count + '<p>';
+				var div = '<div class="photo well" style="text-align:center">';
+					div += '<a href="' + photo.link + '">';
+					div += '<img src="'+ photo.src_big +'" class="img-thumbnail"/></a>'
+					
+					if( photo.caption )
+						div += '<p class="lead">"' + photo.caption + '</p>';
+					
+					div += '<p class="lead">Likes ' + photo.like_info.like_count + ' | Comments ' + photo.comment_info.comment_count;
+					div += '</p>'
 					div += '</div>';
 
 				div = $(div);
@@ -224,9 +237,10 @@ $(function(){
 			MG.checkLogin({
 				success: function(){
 					console.log("Hey, you're logged!");
-					fn('ok')
+					fn('ok');
 				},
 				error: function(){
+					fn('error');
 					FB.login(function(){
 						checkLogin();
 					}, {scope: 'user_photos,user_videos,user_status,friends_photos'});
@@ -257,5 +271,9 @@ $(function(){
 		});
 
 		return vals;
+	}
+
+	$.fn.cleanup = function(){
+		$(this).children().remove();
 	}
 });
