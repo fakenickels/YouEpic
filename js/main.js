@@ -79,6 +79,9 @@ $(function(){
 						MG.getUserPhotos( 5, function(data){
 							MG.showPhotos(data, function(){
 								$('#photos-watcher .progress').toggleClass('active');
+								$('div.user-profile')
+									.addClass('alert alert-success')
+									.text('Que tal compartilhar com seus amigos? Aqui está o link http://grsabreu.github.io/?u=' + FB.getUserID() );
 							})
 						}, userID);
 					}
