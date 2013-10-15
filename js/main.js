@@ -1,5 +1,5 @@
 $(function(){
-	//TODO: success expection on gh-pages. Oh Jesus!
+	//TODO: Create a interface for getting results from a friend
 	var form = $('#urls-form'), 
 		inputsField = $('#inputs-field'),
 		commentsBox = $('#comments-box'),
@@ -81,7 +81,7 @@ $(function(){
 								$('#photos-watcher .progress').toggleClass('active');
 								$('div.user-profile')
 									.addClass('alert alert-success')
-									.text('Que tal compartilhar com seus amigos? Aqui está o link http://grsabreu.github.io/?u=' + FB.getUserID() );
+									.text('Que tal compartilhar com seus amigos? Aqui está o link http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() );
 							})
 						}, userID);
 					}
