@@ -1,11 +1,15 @@
 $(function(){
 	//TODO: Create a interface for getting results from a friend
-	var form = $('#urls-form'), 
-		inputsField = $('#inputs-field'),
-		commentsBox = $('#comments-box'),
-		photosBox = $('#photos-watcher'),
-		actionBtn = $('button[type=submit]', form),
-		totalInputs = 1;
+		var form = $('#urls-form'), 
+			inputsField = $('#inputs-field'),
+			commentsBox = $('#comments-box'),
+			photosBox = $('#photos-watcher-content'),
+			actionBtn = $('button[type=submit]', form),
+			friendsThumbsContainer = $('#friends-thumbs'),
+			friendsThumbs,
+			noticeBox = $('div.notices'),
+			modal = $('#select-friend-box'),
+			totalInputs = 1;
 
 	console.log(actionBtn)
 
@@ -13,6 +17,20 @@ $(function(){
 	var MG = {
 		
 		init: function(){
+			if( location.href.indexOf('?u=') > -1 ){
+				noticeBox.html('Você veio aqui pelo link que alguém ti deu, para ver é só clicar em <b>"Ver fotos/status mais curtidos"</b>-><b>"Pelo link"</b>')
+				
+				$('li.on-link')
+					.show()
+					.find('a')
+					.bind('click', function(){
+						if( location.href.indexOf('?u=') > -1 ){
+							userID = location.href.split('?u=')[1];
+						}
+
+						setPhotosToUser( userID );
+					})
+			}
 
 			// #comments-watcher
 			$('#urls-form').submit(function(e){
@@ -62,30 +80,46 @@ $(function(){
 				$(this).parent().remove();
 			});
 
-			// end of #comments-watcher
-			// #photos-watcher
+			// == #photos-watcher
 
-			$('a[href=#photos-watcher]').bind('click', function(){
+			// For this user photos
+			$('#tab-menu .for-photos li.my-photos-watcher a').bind('click', function(){
+				setPhotosToUser();
+			});
+
+			// For friends photos
+			$('#tab-menu .for-photos li.friend-photos-watcher a').bind('click', function(){
+				MG.getFriendID(function( userID ){
+					setPhotosToUser( userID );
+				});
+			});
+
+			// no comment :/
+			function setPhotosToUser( userID, likeUser ){
 				console.log('#photos-watcher!');
-				$('#photos-watcher').cleanup();
+				// Cleanup older photos...
+				$('#photos-watcher #photos-watcher-content').cleanup();
 				$('#photos-watcher .progress').toggleClass('active');
+				
 				MG.forceLogin(function(response){
 					if( response == 'ok' ){
-						var userID = undefined;
-						if( location.href.indexOf('?u=') > -1 ){
-							userID = location.href.split('?u=')[1];
-						}
-
 						MG.getUserPhotos( 5, function(data){
 							MG.showPhotos(data, function(){
 								$('#photos-watcher .progress').toggleClass('active');
-								$('div.user-profile')
-									.addClass('alert alert-success')
-									.text('Que tal compartilhar com seus amigos? Aqui está o link http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() );
+								$('div.notices')
+									.html('Que tal compartilhar seu rank com seus amigos? Aqui está o link <b>http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() + '</b>');
 							})
-						}, userID);
+						}, userID, likeUser);
 					}
 				});
+			}
+
+
+			// Kick friends search [in modal]
+			$('#friend-search').bind('keydown keyup', function(){
+				var val = $(this).val();
+
+				MG.friendSearch( val );
 			});
 		},
 
@@ -190,11 +224,15 @@ $(function(){
 			});
 		},
 
-		getUserPhotos: function(limit, fn, userID){
+		getUserPhotos: function(limit, fn, userID, likeUser){
 			limit = limit || 3;
 			userID = userID || FB.getUserID();
-			 
-			var query = 'SELECT pid, caption, link, like_info, comment_info,src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE owner = '+ userID +' ) ORDER BY like_info.like_count DESC LIMIT 0,' + limit;
+			var query = '';
+			if( !likeUser ) 
+				query = 'SELECT pid, caption, link, like_info, comment_info,src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE owner = '+ userID +' ) ORDER BY like_info.like_count DESC LIMIT 0,' + limit;
+			else
+				query = 'SELECT object_id, object_type, user_id FROM like WHERE object_id IN ( SELECT object_id FROM photo WHERE owner = '+ likeUser +' ) AND user_id = me()';
+
 			FB.api({
 				method: 'fql.query',
 				query: query
@@ -228,6 +266,25 @@ $(function(){
 			fn();
 		},
 
+		getStatus: function(limit, fn, userID, likeUser){
+			var query = '';
+			if( !likeUser )
+				query = 'SELECT message, like_info, comment_info, status_id FROM status WHERE uid = ' + userID;
+			else
+				query = 'SELECT object_id, object_type, user_id FROM like WHERE object_id IN ( SELECT status_id FROM status WHERE uid = me() ) AND user_id = ' + likeUser;
+			
+			FB.api({
+				method: 'fql.query',
+				query: query
+			}, function(data){
+
+			});
+		},
+
+		showStatus: function( comments ){
+
+		},
+
 		checkLogin: function(fns){
 			var status = '';
 			FB.getLoginStatus(function(status){
@@ -241,19 +298,22 @@ $(function(){
 		},
 
 		forceLogin: function( fn ){
-			MG.checkLogin({
+			var fns = {
 				success: function(){
 					console.log("Hey, you're logged!");
 					fn('ok');
 				},
+
 				error: function(){
 					fn('error');
 					FB.login(function(){
 						// Reload it
-						MG.checkLogin();
+						MG.checkLogin(fns);
 					}, {scope: 'user_photos,user_videos,user_status,friends_photos'});
-				}
-			});		
+				}				
+			};
+
+			MG.checkLogin( fns );		
 		},
 
 		sortBy: function( key, objsArr ){
@@ -264,6 +324,66 @@ $(function(){
 			});
 
 			return sortedArr;
+		},
+
+		// Controls the modal. When user click in a box, returns the id of selected friend
+		getFriendID: function( callback ){
+			$('#select-friend-box').modal('show');
+
+			console.log('invoking FB#api. Waiting data...');
+			FB.api('/me/friends', function(friendsBlocks){
+				$.each(friendsBlocks, function(j, block){
+					$.each( block, function(i, friend){
+						var li = '<a href="#" class="friend btn btn-primary btn-lg btn-block" user-id="'+ friend.id +'">';
+							li += friend.name;
+							li += '</a>';
+
+						li = $(li);
+						li.appendTo( friendsThumbsContainer );
+					});
+				});
+
+				friendsThumbs = $('#friends-thumbs .friend');
+
+				friendsThumbs.bind('click', function(){
+					modal.modal('hide');
+
+					var userID = $(this).attr('user-id');
+					callback( userID );
+				})
+			});
+		},
+
+		friendSearch: function( search ){
+			if( search == '' )
+				friendsThumbs.show();
+			else
+				friendsThumbs.show().each(function(){
+					var userName = $(this).text();
+					if( userName.slice(0, search.length) != search ){
+						$(this).hide();
+					}
+				});
+		},
+
+		// Return ID[s] from URL
+		// ?u=ID, indicates just a friend
+		// ?=ID,ID2 indicates a relationship
+		parseURL: function(){
+			var loc = location.href;
+			if( loc.indexOf('?=u') > -1 ){
+				if( loc.indexOf(',') > -1 ){
+					var ids = loc.match(/\d+,\d+/g)[0].split(',');
+
+					return ids;
+				} else {
+					var id = loc.match(/\d+/g)[0]
+
+					return id;
+				}
+			}
+			else
+				return false; // nothing in the URL
 		}
 	}
 

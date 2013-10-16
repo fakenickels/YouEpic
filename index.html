@@ -36,12 +36,31 @@
    }(document, 'script', 'facebook-jssdk'));
 </script>	
 	<div id='container' class='container'>
-		<div class='site-name jumbotron'>
-			<h1>Moleque Gaiato</h1>
+
+		<div id='select-friend-box' class='modal fade' role='dialog' tabindex='-1' aria-labelledby="select-friend-box"> 
+			<div class='modal-dialog'>
+				<div class='modal-header'>
+					<button type='botton' class='close' data-dismiss='modal'>&times; Fechar</button>
+					<h2 class='modal-title'>Selecione o amigo</h2>
+					<p class='lead'>*As fotos não serão mostradas para que a busca seja carregada mais rapidamente</p>
+				</div>
+				<div class='modal-body'>
+					<div class='pull-right'> <input type='text' id='friend-search' placeholder='Pesquisar amigo...'/> </div><br>
+					<div class='btn-group-vertical' id='friends-thumbs'>
+					</div>
+				</div>
+				<div class='modal-footer'>
+					<button type='button' class='btn btn-danger'>Não clique em mim</button>
+				</div>
+			</div>
 		</div>
 
-		<div class='user-profile'>
+		<div class='site-name jumbotron'>
+			<h1>Menino Gaiato</h1>
+		</div>
 
+		<div class='notices alert alert-success'>
+			<b>Bem-vindo!</b> (essa box é usada para noticar coisas)
 		</div>
 		
 		<div class='tabs'>
@@ -51,22 +70,70 @@
 					<a href="#comments-watcher" data-toggle='tab'>Acompanhe seus comentários em postagens</a>
 				</li>
 
-				<li>
-					<a href="#status-watcher" data-toggle='tab'>Ver meu status mais curtidos</a>
-				</li>
+				<li class='dropdown'>
+					<a href='#' data-toggle='dropdown' class='dropdown-toggle'>
+						<i class='glyphicon glyphicon-align-justify'></i> Ver status mais curtidos
+					</a>
+					<ul class='dropdown-menu' role='menu'>
+						<li class='on-link'>
+								<a href="#link-status-watcher" data-toggle='tab'>
+									<i class='glyphicon glyphicon-align-justify'></i> Pelo link
+								</a>
+						</li>
+
+						<li>
+								<a href="#my-status-watcher" data-toggle='tab'>
+									<i class='glyphicon glyphicon-align-justify'></i> Meu status mais curtidos
+								</a>
+						</li>	
+
+						<li>
+								<a href="#friend-status-watcher" data-toggle='tab'>
+									<i class='glyphicon glyphicon-align-justify'></i> Mais curtidos de um amigo
+								</a>
+						</li>						
+					</ul>
+				</li>				
+
+				<li class='dropdown for-photos'>
+					<a href='#' data-toggle='dropdown' class='dropdown-toggle'>
+						<i class='glyphicon glyphicon-picture'></i> Ver fotos mais curtidas
+					</a>
+					<ul class='dropdown-menu' role='menu'>
+						<li class='my-photos-watcher'>
+								<a href="#photos-watcher" data-toggle='tab'>
+									<i class='glyphicon glyphicon-picture'></i> Ver minhas fotos mais curtidas
+								</a>
+						</li>
+						<li class='on-link'>
+								<a href="#photos-watcher" data-toggle='tab'>
+									<i class='glyphicon glyphicon-picture'></i> Pelo link
+								</a>
+						</li>						
+						<li class='friend-photos-watcher'>
+								<a href="#photos-watcher" data-toggle='tab'>
+									<i class='glyphicon glyphicon-picture'></i> Ver fotos mais curtidas de um amigo
+								</a>
+						</li>						
+					</ul>
+				</li>				
 
 				<li>
-					<a href="#photos-watcher" data-toggle='tab'>Ver minhas fotos mais curtidas</a>
+					<a href='#help' data-toggle='tab'>
+						<i class='glyphicon glyphicon-star'></i> Pra que serve tudo isso? (Quickguide)
+					</a>
 				</li>
 			</ul>
 
 			<div id='tab-menu-content' class='tab-content'>
 				<div class='tab-pane fade active in' id='comments-watcher'>
 					<div class='title'>
-						<h1>Acompanhe a sua gaiatice (recurso beta, melhor ir ver as outras coisas...)</h1>
+						<h1>Acompanhe a sua gaiatice <small>(recurso beta, melhor ir ver as outras coisas...)</small></h1>
 					</div>
 					<div id='form-field'>
-						<p class='lead muted'>Monitore os likes que você recebe posts. <br>Insira as URLs dos posts que você comentou</p>
+						<p class='lead muted'>Monitore os likes que você recebe posts. 
+							<br>Insira as URLs dos posts que você comentou (elas serão salvas no seu browser, então pode fechar a aba e voltar depois)
+						</p>
 						<form id='urls-form' role='form'>
 							<div id='inputs-field'>
 								<div class='form-group well'>
@@ -80,14 +147,40 @@
 					</div>
 				</div>
 
-				<div class='tab-pane fade' id='status-watcher'>Oi, caba! Essa opção ai vai ser implementada. Calma ai!</div>
+				<div class='tab-pane fade' id='my-status-watcher'>Oi, caba! Essa opção ai vai ser implementada. Calma ai!</div>
+				<div class='tab-pane fade' id='friend-status-watcher'>Oi, caba! Essa opção ai vai ser implementada. Calma ai!</div>
 
 				<div class='tab-pane fade' id='photos-watcher'>
 					<div class='progress progress-striped active'>
 						<div class='progress-bar' role='progressbar' style='width:100%'>Num se avexe que já vai...</div>
 					</div>
+					<div id='photos-watcher-content'>
+					</div>
 				</div>
 
+				<div class='tab-pane fade' id='help'>
+					<h1>Pra que serve o Menino Gaiato?</h1>
+					<p class='lead muted'><i>Bem... pode ser usado para curiosidade ou para stalkear alguém...</i></p>
+					<hr/>
+					<p class='lead'>Eu que criei imagino no mínino três possibilidades de uso:</p>
+					<ul>
+						<li>
+							<h3>Você está conhecendo alguém e quer saber um pouco da vida da pessoa e tal e tudo mais.</h3>
+							<p>Ver o que a pessoa fez de melhor no Facebook ajuda bastante, né não?!</p>
+						</li>
+						<li>
+							<h3>Por simples curiosidade :)</h3>
+							É bom ficar vendo as fotos e os status mais curtidos seus ou de um amigo (passa-tempo)
+						</li>
+						<li>
+							<h3>Para namorados ciumentos <small>(ciumentos não, preocupados em defender o que é seu!)</small></h3>
+							<p>Veja se aquela piranha anda curtindo demais as coisas do seu namo! (gente!)</p>
+						</li>
+					</ul>
+					<hr>
+					<h1>Por quê o nome "Menino Gaiato"?</h1>
+					<p class='lead'>Sei lá, apareceu na minha cabeça e botei (dar nomes as coisas é uma coisa díficil, sabia?!)</p>
+				</div>				
 			</div>
 		</div>
 
