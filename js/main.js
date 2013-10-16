@@ -1,5 +1,5 @@
 $(function(){
-	//TODO: Create a interface for getting results from a friend
+	//TODO: Create a interface for getting results from a friend [almost done]
 		var form = $('#urls-form'), 
 			inputsField = $('#inputs-field'),
 			commentsBox = $('#comments-box'),
@@ -97,17 +97,18 @@ $(function(){
 			// no comment :/
 			function setPhotosToUser( userID, likeUser ){
 				console.log('#photos-watcher!');
-				// Cleanup older photos...
-				$('#photos-watcher #photos-watcher-content').cleanup();
+
 				$('#photos-watcher .progress').toggleClass('active');
-				
 				MG.forceLogin(function(response){
 					if( response == 'ok' ){
 						MG.getUserPhotos( 5, function(data){
 							MG.showPhotos(data, function(){
-								$('#photos-watcher .progress').toggleClass('active');
+								$('#photos-watcher .progress')
+									.toggleClass('active')
+									.find('#photos-watcher .progressbar').text('Já foi!');
+
 								$('div.notices')
-									.html('Que tal compartilhar seu rank com seus amigos? Aqui está o link <b>http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() + '</b>');
+									.html('Que tal compartilhar o seu rank com seus amigos? Aqui está o link <b>http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() + '</b>');
 							})
 						}, userID, likeUser);
 					}
@@ -178,7 +179,7 @@ $(function(){
 
 		//TODO: make MG#getComments support data paging
 		getComments: function( objID, userID, fn ){
-			var fql = 'SELECT fromid, likes, time, comment_count, post_id_cursor, text FROM comment WHERE post_id = $id';
+			var fql = 'SELECT fromid, likes, time, comment_count, post_id_cursor, text FROM comment WHERE post_id = $id ORDER BY likes DESC';
 				fql = fql.replace('$id', objID);
 
 			var userComments = [];
@@ -246,13 +247,14 @@ $(function(){
 			console.log('preparing to show photos');
 			console.log(photos);
 
+			photosBox.cleanup();
 			$.each( photos, function(i, photo){
 				var div = '<div class="photo well" style="text-align:center">';
 					div += '<a href="' + photo.link + '">';
 					div += '<img src="'+ photo.src_big +'" class="img-thumbnail"/></a>'
 					
 					if( photo.caption )
-						div += '<p class="lead">"' + photo.caption + '</p>';
+						div += '<p class="lead">"' + photo.caption.replace('\n', '<br>') + '</p>';
 					
 					div += '<p class="lead">Likes ' + photo.like_info.like_count + ' | Comments ' + photo.comment_info.comment_count;
 					div += '</p>'
@@ -327,39 +329,44 @@ $(function(){
 		},
 
 		// Controls the modal. When user click in a box, returns the id of selected friend
+		friendsGot: false,
 		getFriendID: function( callback ){
 			$('#select-friend-box').modal('show');
 
 			console.log('invoking FB#api. Waiting data...');
-			FB.api('/me/friends', function(friendsBlocks){
-				$.each(friendsBlocks, function(j, block){
-					$.each( block, function(i, friend){
-						var li = '<a href="#" class="friend btn btn-primary btn-lg btn-block" user-id="'+ friend.id +'">';
-							li += friend.name;
-							li += '</a>';
+			if( !MG.friendsGot )
+				FB.api('/me/friends', function(friendsBlocks){
+					$.each(friendsBlocks, function(j, block){
+						$.each( block, function(i, friend){
+							var li = '<a href="#" class="friend btn btn-primary btn-lg btn-block" user-id="'+ friend.id +'">';
+								li += friend.name;
+								li += '</a>';
 
-						li = $(li);
-						li.appendTo( friendsThumbsContainer );
+							li = $(li);
+							li.appendTo( friendsThumbsContainer );
+						});
 					});
+
+					friendsThumbs = $('#friends-thumbs .friend');
+
+					friendsThumbs.bind('click', function(){
+						modal.modal('hide');
+
+						var userID = $(this).attr('user-id');
+						callback( userID );
+					});
+
+					MG.friendsGot = true;
 				});
-
-				friendsThumbs = $('#friends-thumbs .friend');
-
-				friendsThumbs.bind('click', function(){
-					modal.modal('hide');
-
-					var userID = $(this).attr('user-id');
-					callback( userID );
-				})
-			});
 		},
 
 		friendSearch: function( search ){
+			search = search.toLowerCase();
 			if( search == '' )
 				friendsThumbs.show();
 			else
 				friendsThumbs.show().each(function(){
-					var userName = $(this).text();
+					var userName = $(this).text().toLowerCase();
 					if( userName.slice(0, search.length) != search ){
 						$(this).hide();
 					}
@@ -402,6 +409,6 @@ $(function(){
 	}
 
 	$.fn.cleanup = function(){
-		$(this).children().remove();
+		return $(this).html('');
 	}
 });

@@ -43,6 +43,7 @@
 					<button type='botton' class='close' data-dismiss='modal'>&times; Fechar</button>
 					<h2 class='modal-title'>Selecione o amigo</h2>
 					<p class='lead'>*As fotos não serão mostradas para que a busca seja carregada mais rapidamente</p>
+					<p>**Se você tiver algo em torno de 1000 amigos, a busca pode demorar uns 3s</p>
 				</div>
 				<div class='modal-body'>
 					<div class='pull-right'> <input type='text' id='friend-search' placeholder='Pesquisar amigo...'/> </div><br>
@@ -128,10 +129,10 @@
 			<div id='tab-menu-content' class='tab-content'>
 				<div class='tab-pane fade active in' id='comments-watcher'>
 					<div class='title'>
-						<h1>Acompanhe a sua gaiatice <small>(recurso beta, melhor ir ver as outras coisas...)</small></h1>
+						<h1>Acompanhe a sua gaiatice nas pages <small>(recurso beta, melhor ir ver as outras coisas...)</small></h1>
 					</div>
 					<div id='form-field'>
-						<p class='lead muted'>Monitore os likes que você recebe posts. 
+						<p class='lead muted'>Monitore os likes que você recebe em comentários. 
 							<br>Insira as URLs dos posts que você comentou (elas serão salvas no seu browser, então pode fechar a aba e voltar depois)
 						</p>
 						<form id='urls-form' role='form'>
@@ -151,8 +152,12 @@
 				<div class='tab-pane fade' id='friend-status-watcher'>Oi, caba! Essa opção ai vai ser implementada. Calma ai!</div>
 
 				<div class='tab-pane fade' id='photos-watcher'>
-					<div class='progress progress-striped active'>
+					<div class='progress progress-striped'>
 						<div class='progress-bar' role='progressbar' style='width:100%'>Num se avexe que já vai...</div>
+					</div>
+					<div>
+						Quer filtrar para ver que fotos uma pessoa especifica andou curtindo? :->
+						<a href="#" class='btn btn-danger btn-large'>Filtrar pessoa <i class='glyphicon glyphicon-user'></i></a>
 					</div>
 					<div id='photos-watcher-content'>
 					</div>
@@ -169,17 +174,22 @@
 							<p>Ver o que a pessoa fez de melhor no Facebook ajuda bastante, né não?!</p>
 						</li>
 						<li>
-							<h3>Por simples curiosidade :)</h3>
-							É bom ficar vendo as fotos e os status mais curtidos seus ou de um amigo (passa-tempo)
+							<h3>Por simples curiosidade :) (ou tédio D:) </h3>
+							É bom ficar vendo as fotos e os status mais curtidos seus ou de um amigo (passa-tempo) (ou porque você tá sem nada pra fazer mesmo D:)
 						</li>
 						<li>
 							<h3>Para namorados ciumentos <small>(ciumentos não, preocupados em defender o que é seu!)</small></h3>
 							<p>Veja se aquela piranha anda curtindo demais as coisas do seu namo! (gente!)</p>
-						</li>
+						</li>						
 					</ul>
 					<hr>
 					<h1>Por quê o nome "Menino Gaiato"?</h1>
 					<p class='lead'>Sei lá, apareceu na minha cabeça e botei (dar nomes as coisas é uma coisa díficil, sabia?!)</p>
+					<hr>
+					<h1>Deixe seu comentário com alguma sugestão :D</h1>
+					<div class='comments well' style='text-align:center'>
+					  <div class="fb-comments" data-href="http://grsabreu.github.com/YouEpic" data-width="470" mobile='auto-detect'></div>
+					</div>
 				</div>				
 			</div>
 		</div>
@@ -190,5 +200,15 @@
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src='js/main.js'></script>	
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44903510-1', 'grsabreu.github.io');
+  ga('send', 'pageview');
+
+</script>
 </body>
 </html>
