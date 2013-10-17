@@ -32,18 +32,17 @@ $(function(){
 					if( response == 'ok' ){
 
 						commentsBox.cleanup();
-						var urls = inputsField.find('input').vals(), 
+						var comments_urls = inputsField.find('input').vals(), 
 							total = urls.length-1,
 							posts = [];
 
 
-						$.each(urls, function(i, url){
-							var urlID = MG.parseObjID(url), 
+						$.each(comments_urls, function(i, url){
+							var commentID = MG.parseObjID(url), 
 								arrForThis;
 
 							//TODO: Check a other user [user friend] comments too 
-							console.log('preparing to get comments from ' + urlID);
-							console.log('total (counting from zero) == ' + total)
+							console.log('preparing to get comment ' + urlID);
 							MG.getComments(urlID, null, function(data){
 								console.log('parsing comments from ' + urlID, 'index ' + i)
 								arrForThis = data;
@@ -126,34 +125,21 @@ $(function(){
 		},
 
 		parseObjID: function( url ){
-			var id = url.match(/(fbid=\d+)|(permalink\/\d+)/g);
+			var id = url.match(/(comment_id=\d+)/g);
 				id = id[0].match(/\d+/g);
 
 			return id[0]; 
 		},
 
 		//TODO: make MG#getComments support data paging
-		getComments: function( objID, userID, fn ){
-			var fql = 'SELECT fromid, likes, time, comment_count, post_id_cursor, text FROM comment WHERE post_id = $id ORDER BY likes DESC';
-				fql = fql.replace('$id', objID);
+		getComment: function( objID, fn ){
+			var fql = 'SELECT fromid, like_info, time, comment_count, text FROM comment WHERE comment_id = ' + objID;
 
-			var userComments = [];
-			
 			FB.api({
 				method: 'fql.query',
 				query: fql
 			}, function(data){
-				userID = userID || FB.getUserID();
-
-				$.each(data, function(i, obj){
-					if( obj.fromid == userID )
-						userComments.push( obj );
-				});
-
-				console.log(userComments)
-
-				// When end of data receiving and parsing
-				fn( userComments );
+				fn( data );
 			})
 		},
 
@@ -265,7 +251,7 @@ $(function(){
 				MG.shared.setAllToUser( userID, likeUserID, 'photos', limit );
 			},
 
-			get: function(limit, fn, userID, likeUser){
+			get: function(limit, fn, userID, likeUserID){
 				limit = limit || 3;
 				userID = userID || FB.getUserID();
 
