@@ -20,22 +20,8 @@ $(function(){
 		curUserID: undefined,
 
 		init: function(){
-			if( location.href.indexOf('?u=') > -1 ){
-				noticeBox.html('Você veio aqui pelo link que alguém ti deu, para ver é só clicar em <b>"Ver fotos/status mais curtidos"</b>-><b>"Pelo link"</b>')
-				
-				$('li.on-link')
-					.show()
-					.find('a')
-					.bind('click', function(){
-						if( location.href.indexOf('?u=') > -1 ){
-							userID = location.href.split('?u=')[1];
-						}
-
-						setPhotosToUser( userID );
-					})
-			}
-
 			// #comments-watcher
+			// TODO: Add #comments to shared
 			$('#urls-form').submit(function(e){
 				e.preventDefault();
 
@@ -53,7 +39,7 @@ $(function(){
 
 						$.each(urls, function(i, url){
 							var urlID = MG.parseObjID(url), 
-								arrForThis = undefined;
+								arrForThis;
 
 							//TODO: Check a other user [user friend] comments too 
 							console.log('preparing to get comments from ' + urlID);
@@ -82,62 +68,8 @@ $(function(){
 			$('button.url-remove-btn', form).click(function(){
 				$(this).parent().remove();
 			});
-
-			// == #photos-watcher
-
-			// For this user photos
-			$('#tab-menu .for-photos li.my-photos-watcher a').bind('click', function(){
-				MG.curUserID = FB.getUserID();
-				setPhotosToUser();
-			});
-
-			// For friends photos
-			$('#tab-menu .for-photos li.friend-photos-watcher a').bind('click', function(){
-				MG.onEvent = 'friends-photos';
-
-				MG.getFriendID(function( userID ){
-					setPhotosToUser( userID );
-					MG.curUserID = userID;
-				}, 'friends-photos');
-			});
-			
-			// Filter a friend that likes
-			$('#photos-watcher a.friend-filter-btn').bind('click', function(){
-				MG.onEvent = 'filter-friend';
-
-				MG.getFriendID(function( likeUserID ){
-					setPhotosToUser( MG.curUserID, likeUserID );
-				}, 'filter-friend');
-			});
-
-			// no comment :/
-			function setPhotosToUser( userID, likeUser ){
-				console.log('#photos-watcher!');
-
-				$('#photos-watcher .progress').toggleClass('active');
-				MG.forceLogin(function(response){
-					if( response == 'ok' ){
-						MG.getUserPhotos( 5, function(data){
-							MG.showPhotos(data, function(){
-								$('#photos-watcher .progress').toggleClass('active');
-
-								$('div.notices')
-									.html('Que tal compartilhar o seu rank com seus amigos? Aqui está o link <b>http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() + '</b>');
-							})
-						}, userID, likeUser);
-					} else {
-						noticeBox
-							.fadeOut(50)
-							.fadeIn(100)
-							.html('<b>Ahh lek!</b> Alguma coisa deu errado, tente recarregar a página e tente de novo.');
-					}
-				});
-			}
-
-			// TODO: finish this
-			// function setSomethingToUser( thing, userID, likeUser ){
-			// }			
-
+			// Set all config for objects in MG.shared.objs
+			MG.shared.init();
 
 			// Kick friends search [in modal]
 			$('#friend-search').bind('keydown keyup', function(){
@@ -206,6 +138,7 @@ $(function(){
 				fql = fql.replace('$id', objID);
 
 			var userComments = [];
+			
 			FB.api({
 				method: 'fql.query',
 				query: fql
@@ -248,94 +181,174 @@ $(function(){
 			});
 		},
 
-		getUserPhotos: function(limit, fn, userID, likeUser){
-			limit = limit || 3;
-			userID = userID || FB.getUserID();
-			var query = '';
-			if( !likeUser ) 
-				query = 'SELECT pid, caption, link, like_info, comment_info,src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE owner = '+ userID +' ) ORDER BY like_info.like_count DESC LIMIT 0,' + limit;
-			else
-				query = 'SELECT object_id, object_type, user_id FROM like WHERE object_id IN ( SELECT object_id FROM photo WHERE owner = '+ likeUser +' ) AND user_id = me()';
+		shared: {
+			objs: 'photos status',
 
-			FB.api({
-				method: 'fql.query',
-				query: query
-			}, function(data){
-				console.log(data)
-				fn(data);
-			});
-		},		
+			init: function(){
+				$.each( MG.shared.objs.split(' ') , function(i, fbObject){
+					// By passed link
+					if( location.href.indexOf('?u=') > -1 ){
+						noticeBox
+							.html('Você veio aqui pelo link que alguém ti deu, para ver é só clicar em <b>"Ver fotos/status mais curtidos"</b>-><b>"Pelo link"</b>');
+						
+						$('#tab-menu .for-'+ fbObject +' li.on-link')
+							.show()
+							.find('a')
+							.bind('click', function(){
+								if( location.href.indexOf('?u=') > -1 ){
+									linkUserID = location.href.split('?u=')[1];
+								}
 
-		showPhotos: function( photos, fn ){
-			console.log('preparing to show photos');
-			console.log(photos);
+								MG[fbObject].setAllToUser(LinkUserID);
+							});
+					}					
 
-			photosBox.cleanup();
-			$.each( photos, function(i, photo){
-				var div = '<div class="photo well" style="text-align:center">';
-					div += '<a href="' + photo.link + '">';
-					div += '<img src="'+ photo.src_big +'" class="img-thumbnail"/></a>'
-					
-					if( photo.caption )
-						div += '<p class="lead">"' + photo.caption.replace('\n', '<br>') + '</p>';
-					
-					div += '<p class="lead">Likes ' + photo.like_info.like_count + ' | Comments ' + photo.comment_info.comment_count;
-					div += '</p>'
-					div += '</div>';
+					// For current user {fbObject}
+					$('#tab-menu .for-'+ fbObject +' li.my-'+ fbObject +'-watcher a').bind('click', function(){
+						MG.curUserID = FB.getUserID();
+						MG[fbObject].setAllToUser();
+					});				
 
-				div = $(div);
+					// For a friend {fbObject}
+					var selector = '#tab-menu .for-'+ fbObject +' li.friend-'+ fbObject +'-watcher a';
 
-				div.appendTo(photosBox);
-			});
+					$( selector ).bind('click', function(){
+						MG.onEvent = 'friend-' + fbObject;
 
-			fn();
-		},
+						MG.getFriendID(function( userID ){
+							MG[fbObject].setAllToUser( userID );
+							MG.curUserID = userID;
+						}, 'friend-'+ fbObject );
+					});
 
-		getStatus: function(limit, fn, userID, likeUser){
-			var query = '';
+					// Filter a friend who likes {fbObject} of current user
+					$('#'+ fbObject +'-watcher a.friend-filter-btn').bind('click', function(){
+						MG.onEvent = 'filter-friend-' + fbObject;
+
+						MG.getFriendID(function( likeUserID, likeUserName ){
+							MG[fbObject].setAllToUser( MG.curUserID, likeUserID );
+							noticeBox.html('Você está vendo as fotos que ' + likeUserName + ' curtiu');
+						}, 'filter-friend-' + fbObject);
+					});					
+				});
+			},
+
+			setAllToUser: function( userID, likeUserID, objName, limit ){
+				console.log('#'+ objName+'-watcher!');
+
 				limit = limit || 5;
-			if( !likeUser )
-				query = 'SELECT message, like_info, comment_info,status_id FROM status WHERE uid = '+ userID +' ORDER BY like_info.like_count DESC LIMIT 0,'+ limit;
-			else
-				query = 'SELECT object_id, object_type, user_id FROM like WHERE object_id IN ( SELECT status_id FROM status WHERE uid = '+ userID +') AND user_id = ' + likeUser;
-			
-			FB.api({
-				method: 'fql.query',
-				query: query
-			}, function(data){
-				if( !likeUser )
-					fn(data);
-				else {
-					//TODO: finish this...
-					// var finalData = [];
+				$('#'+ objName +'-watcher .progress').toggleClass('active');
+				MG.forceLogin(function( response ){
+					if( response == 'ok' ){
 
-					// $.each(data, function(i, status){
-					// 	FB.api({
-					// 		method: 'fql.query',
-					// 		query: 'SELECT message, like_info, comment_info FROM status WHERE status_id = ' + status.object_id
-					// 	}, function(data){
-					// 		finalData = finalData.concat( data );
-					// 	});
-					// }
-				}
-			});
+						MG[ objName ].get(limit, function(data){
+							MG[ objName ].createView(data, function(){
+								$( '#' + objName + '-watcher .progress' ).toggleClass('active');
+
+								noticeBox
+									.html('Que tal compartilhar o <b>seu</b> rank com seus amigos? Aqui está o link <b>http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() + '</b>');								
+								});
+						}, userID, likeUserID);
+
+					} else {
+						noticeBox
+							.fadeOut( 50 )
+							.fadeIn( 100 )
+							.html('<b>Ahh lek!</b> Alguma coisa deu errado, tente recarregar a página e tente de novo.');
+					}
+				});
+			}
 		},
 
-		showStatus: function( comments ){
-			console.log('preparing to show status');
+		photos: {
+			setAllToUser: function( userID, likeUserID, limit ){
+				MG.shared.setAllToUser( userID, likeUserID, 'photos', limit );
+			},
 
-			$.each(comments, function(i, comment){
-				var div = '<div class="well status" style="text-align:center">'
-					div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ comment.status_id + '">'
-					div += comment.message 
-					div += '</a></h3>';
-					div += '<p class="lead"> Likes '+ comment.like_info.like_count;
-					div += ' | Comments ' + comment + '</p></div>';
+			get: function(limit, fn, userID, likeUser){
+				limit = limit || 3;
+				userID = userID || FB.getUserID();
 
-				div = $(div);
+				var query = '';
+				if( !likeUser ) 
+					query = 'SELECT pid, caption, link, like_info, comment_info,src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE owner = '+ userID +' ) ORDER BY like_info.like_count DESC LIMIT 0,' + limit;
+				else
+					query = 'SELECT pid, caption, link, like_info, comment_info, src_big FROM photo WHERE object_id IN ( SELECT object_id, object_type, user_id FROM like WHERE object_id IN ( SELECT object_id FROM photo WHERE owner = '+ userID +' ) AND user_id = '+ likeUserID +' )';
+				
+				FB.api({
+					method: 'fql.query',
+					query: query
+				}, function(data){
+					console.log(data)
+					fn(data);
+				});
+			},
 
-				div.appendTo(statusBox);
-			});
+			createView: function( photos, fn ){
+				console.log('preparing to show photos');
+				console.log(photos);
+
+				photosBox.cleanup();
+				$.each( photos, function(i, photo){
+					var div = '<div class="photo well" style="text-align:center">';
+						div += '<a href="' + photo.link + '">';
+						div += '<img src="'+ photo.src_big +'" class="img-thumbnail"/></a>'
+						
+						if( photo.caption )
+							div += '<p class="lead">"' + photo.caption.replace('\n', '<br>') + '</p>';
+						
+						div += '<p class="lead">Likes ' + photo.like_info.like_count + ' | Comments ' + photo.comment_info.comment_count;
+						div += '</p>'
+						div += '</div>';
+
+					div = $(div);
+
+					div.appendTo(photosBox);
+				});
+
+				fn();
+			}			
+		},
+
+		status: {
+
+			setAllToUser: function( userID, likeUserID, limit ){
+				MG.shared.setAllToUser(userID, likeUserID, 'status', limit);
+			},
+
+			get: function( limit, fn, userID, likeUserID ){
+				var query = '';
+					limit = limit || 5;
+
+				if( !likeUser )
+					query = 'SELECT message, like_info, comment_info,status_id FROM status WHERE uid = '+ userID +' ORDER BY like_info.like_count DESC LIMIT 0,'+ limit;
+				else
+					query = 'SELECT status_id, message, like_info, comment_info FROM status WHERE status_id IN ( SELECT object_id FROM like WHERE object_id IN ( SELECT status_id FROM status WHERE uid = '+ userID +' ) AND user_id = '+ likeUserID +' )';
+				
+				FB.api({
+					method: 'fql.query',
+					query: query
+				}, function(data){
+					fn(data);
+				});				
+			},
+
+			createView: function( comments ){
+				console.log('preparing to show status');
+
+				$.each(comments, function(i, comment){
+					var div = '<div class="well status" style="text-align:center">'
+						div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ comment.status_id + '">';
+						div += comment.message.replace('\n', '<br>');
+						div += '</a></h3>';
+						div += '<p class="lead"> Likes '+ comment.like_info.like_count;
+						div += ' | Comments ' + comment.comment_info.comment_count + '</p></div>';
+
+					div = $(div);
+
+					div.appendTo(statusBox);
+				});
+			}
 		},
 
 		checkLogin: function(fns){
@@ -406,8 +419,9 @@ $(function(){
 						if( MG.onEvent == onEvent ){
 							modal.modal('hide');
 
-							var userID = $(this).attr('user-id');
-							callback( userID );
+							var userID = $(this).attr('user-id'),
+								userName = $(this).text();
+							callback( userID, userName );
 						}
 					});
 
