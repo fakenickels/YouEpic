@@ -46,7 +46,14 @@
 					<p>**Se você tiver algo em torno de 1000 amigos, a busca pode demorar uns 3s</p>
 				</div>
 				<div class='modal-body'>
-					<div class='pull-right'> <input type='text' id='friend-search' placeholder='Pesquisar amigo...'/> </div><br>
+					<div class='pull-right'> 
+						<input type='text' class='form-control input-lg' id='friend-search' placeholder='Pesquisar amigo...'/>
+
+						<div class='progress-bar progress-bar-danger' id='friend-search-loading-bar' role='progressbar' style='width:100%'>
+							Carregando seus amigos... (calma, que é só pra amostrar aqui!)
+						</div>
+
+					</div><br>
 					<div class='btn-group-vertical' id='friends-thumbs'>
 					</div>
 				</div>
@@ -169,7 +176,7 @@
 					<div class='progress progress-striped'>
 						<div class='progress-bar' role='progressbar' style='width:100%'>Num se avexe que já vai...</div>
 					</div>
-					
+
 					<div class='well'>
 						<h4>Quer filtrar para ver que fotos uma pessoa especifica andou curtindo? :->*</h4>
 						<a href="#" class='btn btn-danger btn-large friend-filter-btn'>Filtrar pessoa <i class='glyphicon glyphicon-user'></i></a>

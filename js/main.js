@@ -304,10 +304,11 @@ $(function(){
 
 			get: function( limit, fn, userID, likeUserID ){
 				var query = '';
+					userID = userID || FB.getUserID();
 					limit = limit || 5;
 
 				if( !likeUserID )
-					query = 'SELECT message, like_info, comment_info,status_id FROM status WHERE uid = '+ userID +' ORDER BY like_info.like_count DESC LIMIT 0,'+ limit;
+					query = 'SELECT message, like_info, comment_info, status_id FROM status WHERE uid = '+ userID +' ORDER BY like_info.like_count DESC LIMIT 0,'+ limit;
 				else
 					query = 'SELECT status_id, message, like_info, comment_info FROM status WHERE status_id IN ( SELECT object_id FROM like WHERE object_id IN ( SELECT status_id FROM status WHERE uid = '+ userID +' ) AND user_id = '+ likeUserID +' )';
 				
@@ -321,7 +322,7 @@ $(function(){
 
 			createView: function( statuss ){
 				console.log('preparing to show status');
-
+				console.log(statuss);
 				$.each(statuss, function(i, status){
 					var div = '<div class="well status" style="text-align:center">'
 						div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ status.status_id + '">';
@@ -403,6 +404,9 @@ $(function(){
 
 					friendsThumbs = $('#friends-thumbs .friend');
 					friendsThumbs.bind('click', bindEvent);
+
+					$('#friend-search-loading-bar').hide();
+					$('#friend-search').fadeIn(200);
 				});
 			else
 				friendsThumbs.bind('click', bindEvent);
