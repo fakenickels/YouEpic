@@ -319,10 +319,10 @@ $(function(){
 				});				
 			},
 
-			createView: function( status ){
+			createView: function( statuss ){
 				console.log('preparing to show status');
 
-				$.each(status, function(i, status){
+				$.each(statuss, function(i, status){
 					var div = '<div class="well status" style="text-align:center">'
 						div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ status.status_id + '">';
 						div += status.message.replace('\n', '<br>');
