@@ -319,16 +319,16 @@ $(function(){
 				});				
 			},
 
-			createView: function( comments ){
+			createView: function( status ){
 				console.log('preparing to show status');
 
-				$.each(comments, function(i, comment){
+				$.each(status, function(i, status){
 					var div = '<div class="well status" style="text-align:center">'
-						div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ comment.status_id + '">';
-						div += comment.message.replace('\n', '<br>');
+						div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ status.status_id + '">';
+						div += status.message.replace('\n', '<br>');
 						div += '</a></h3>';
-						div += '<p class="lead"> Likes '+ comment.like_info.like_count;
-						div += ' | Comments ' + comment.comment_info.comment_count + '</p></div>';
+						div += '<p class="lead"> Likes '+ status.like_info.like_count;
+						div += ' | Comments ' + status.comment_info.comment_count + '</p></div>';
 
 					div = $(div);
 
@@ -399,20 +399,20 @@ $(function(){
 						});
 					});
 
-					friendsThumbs = $('#friends-thumbs .friend');
-
-					friendsThumbs.bind('click', function(){
-						if( MG.onEvent == onEvent ){
-							modal.modal('hide');
-
-							var userID = $(this).attr('user-id'),
-								userName = $(this).text();
-							callback( userID, userName );
-						}
-					});
-
 					MG.friendsGot = true;
 				});
+			
+			friendsThumbs = $('#friends-thumbs .friend');
+
+			friendsThumbs.bind('click', function(){
+				if( MG.onEvent == onEvent ){
+					modal.modal('hide');
+
+					var userID = $(this).attr('user-id'),
+						userName = $(this).text();
+					callback( userID, userName );
+				}
+			});
 		},
 
 		friendSearch: function( search ){
