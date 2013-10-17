@@ -326,7 +326,7 @@ $(function(){
 
 				statusBox.cleanup();
 				$.each(statuss, function(i, status){
-					var div = '<div class="well status" style="text-align:center">'
+					var div = '<div class="well status" style="text-align:jusfify">'
 						div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ status.status_id + '">';
 						div += status.message.replace('\n', '<br>');
 						div += '</a></h3>';
