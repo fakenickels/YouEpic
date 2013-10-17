@@ -1,9 +1,10 @@
 $(function(){
-	//TODO: Create a interface for getting results from a friend [almost done]
+	//TODO: Implement the resource that allows user filter friends blahblah
 		var form = $('#urls-form'), 
 			inputsField = $('#inputs-field'),
 			commentsBox = $('#comments-box'),
 			photosBox = $('#photos-watcher-content'),
+			statusBox = $('#status-watcher-content'),
 			actionBtn = $('button[type=submit]', form),
 			friendsThumbsContainer = $('#friends-thumbs'),
 			friendsThumbs,
@@ -95,16 +96,15 @@ $(function(){
 				MG.onEvent = 'friends-photos';
 
 				MG.getFriendID(function( userID ){
-					if( eventName == friendPhotos ){
-						setPhotosToUser( userID );
-						MG.curUserID = userID;
-					}
+					setPhotosToUser( userID );
+					MG.curUserID = userID;
 				}, 'friends-photos');
 			});
 			
 			// Filter a friend that likes
 			$('#photos-watcher a.friend-filter-btn').bind('click', function(){
 				MG.onEvent = 'filter-friend';
+
 				MG.getFriendID(function( likeUserID ){
 					setPhotosToUser( MG.curUserID, likeUserID );
 				}, 'filter-friend');
@@ -133,6 +133,10 @@ $(function(){
 					}
 				});
 			}
+
+			// TODO: finish this
+			// function setSomethingToUser( thing, userID, likeUser ){
+			// }			
 
 
 			// Kick friends search [in modal]
@@ -289,21 +293,49 @@ $(function(){
 
 		getStatus: function(limit, fn, userID, likeUser){
 			var query = '';
+				limit = limit || 5;
 			if( !likeUser )
-				query = 'SELECT message, like_info, comment_info, status_id FROM status WHERE uid = ' + userID;
+				query = 'SELECT message, like_info, comment_info,status_id FROM status WHERE uid = '+ userID +' ORDER BY like_info.like_count DESC LIMIT 0,'+ limit;
 			else
-				query = 'SELECT object_id, object_type, user_id FROM like WHERE object_id IN ( SELECT status_id FROM status WHERE uid = me() ) AND user_id = ' + likeUser;
+				query = 'SELECT object_id, object_type, user_id FROM like WHERE object_id IN ( SELECT status_id FROM status WHERE uid = '+ userID +') AND user_id = ' + likeUser;
 			
 			FB.api({
 				method: 'fql.query',
 				query: query
 			}, function(data){
+				if( !likeUser )
+					fn(data);
+				else {
+					//TODO: finish this...
+					// var finalData = [];
 
+					// $.each(data, function(i, status){
+					// 	FB.api({
+					// 		method: 'fql.query',
+					// 		query: 'SELECT message, like_info, comment_info FROM status WHERE status_id = ' + status.object_id
+					// 	}, function(data){
+					// 		finalData = finalData.concat( data );
+					// 	});
+					// }
+				}
 			});
 		},
 
 		showStatus: function( comments ){
+			console.log('preparing to show status');
 
+			$.each(comments, function(i, comment){
+				var div = '<div class="well status" style="text-align:center">'
+					div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ comment.status_id + '">'
+					div += comment.message 
+					div += '</a></h3>';
+					div += '<p class="lead"> Likes '+ comment.like_info.like_count;
+					div += ' | Comments ' + comment + '</p></div>';
+
+				div = $(div);
+
+				div.appendTo(statusBox);
+			});
 		},
 
 		checkLogin: function(fns){
