@@ -400,19 +400,22 @@ $(function(){
 					});
 
 					MG.friendsGot = true;
-				});
-			
-			friendsThumbs = $('#friends-thumbs .friend');
 
-			friendsThumbs.bind('click', function(){
+					friendsThumbs = $('#friends-thumbs .friend');
+					friendsThumbs.bind('click', bindEvent);
+				});
+			else
+				friendsThumbs.bind('click', bindEvent);
+
+			function bindEvent(){
 				if( MG.onEvent == onEvent ){
 					modal.modal('hide');
 
 					var userID = $(this).attr('user-id'),
 						userName = $(this).text();
 					callback( userID, userName );
-				}
-			});
+				}				
+			}
 		},
 
 		friendSearch: function( search ){
