@@ -42,9 +42,9 @@ $(function(){
 								arrForThis;
 
 							//TODO: Check a other user [user friend] comments too 
-							console.log('preparing to get comment ' + urlID);
-							MG.getComments(urlID, null, function(data){
-								console.log('parsing comments from ' + urlID, 'index ' + i)
+							console.log('preparing to get comment ' + commentID);
+							MG.getComment(urlID, null, function(data){
+								console.log('parsing comments ' + commentID, 'index ' + i)
 								arrForThis = data;
 								arrForThis.urlID = urlID;
 
@@ -256,7 +256,7 @@ $(function(){
 				userID = userID || FB.getUserID();
 
 				var query = '';
-				if( !likeUser ) 
+				if( !likeUserID ) 
 					query = 'SELECT pid, caption, link, like_info, comment_info,src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE owner = '+ userID +' ) ORDER BY like_info.like_count DESC LIMIT 0,' + limit;
 				else
 					query = 'SELECT pid, caption, link, like_info, comment_info, src_big FROM photo WHERE object_id IN ( SELECT object_id, object_type, user_id FROM like WHERE object_id IN ( SELECT object_id FROM photo WHERE owner = '+ userID +' ) AND user_id = '+ likeUserID +' )';
