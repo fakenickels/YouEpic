@@ -16,6 +16,8 @@ $(function(){
 	// MeninoGaiato
 	var MG = {
 		
+		curUserID: undefined,
+
 		init: function(){
 			if( location.href.indexOf('?u=') > -1 ){
 				noticeBox.html('Você veio aqui pelo link que alguém ti deu, para ver é só clicar em <b>"Ver fotos/status mais curtidos"</b>-><b>"Pelo link"</b>')
@@ -84,14 +86,28 @@ $(function(){
 
 			// For this user photos
 			$('#tab-menu .for-photos li.my-photos-watcher a').bind('click', function(){
+				MG.curUserID = FB.getUserID();
 				setPhotosToUser();
 			});
 
 			// For friends photos
 			$('#tab-menu .for-photos li.friend-photos-watcher a').bind('click', function(){
+				MG.onEvent = 'friends-photos';
+
 				MG.getFriendID(function( userID ){
-					setPhotosToUser( userID );
-				});
+					if( eventName == friendPhotos ){
+						setPhotosToUser( userID );
+						MG.curUserID = userID;
+					}
+				}, 'friends-photos');
+			});
+			
+			// Filter a friend that likes
+			$('#photos-watcher a.friend-filter-btn').bind('click', function(){
+				MG.onEvent = 'filter-friend';
+				MG.getFriendID(function( likeUserID ){
+					setPhotosToUser( MG.curUserID, likeUserID );
+				}, 'filter-friend');
 			});
 
 			// no comment :/
@@ -103,14 +119,17 @@ $(function(){
 					if( response == 'ok' ){
 						MG.getUserPhotos( 5, function(data){
 							MG.showPhotos(data, function(){
-								$('#photos-watcher .progress')
-									.toggleClass('active')
-									.find('#photos-watcher .progressbar').text('Já foi!');
+								$('#photos-watcher .progress').toggleClass('active');
 
 								$('div.notices')
 									.html('Que tal compartilhar o seu rank com seus amigos? Aqui está o link <b>http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() + '</b>');
 							})
 						}, userID, likeUser);
+					} else {
+						noticeBox
+							.fadeOut(50)
+							.fadeIn(100)
+							.html('<b>Ahh lek!</b> Alguma coisa deu errado, tente recarregar a página e tente de novo.');
 					}
 				});
 			}
@@ -330,7 +349,9 @@ $(function(){
 
 		// Controls the modal. When user click in a box, returns the id of selected friend
 		friendsGot: false,
-		getFriendID: function( callback ){
+
+		onEvent: '',
+		getFriendID: function( callback, onEvent ){
 			$('#select-friend-box').modal('show');
 
 			console.log('invoking FB#api. Waiting data...');
@@ -350,10 +371,12 @@ $(function(){
 					friendsThumbs = $('#friends-thumbs .friend');
 
 					friendsThumbs.bind('click', function(){
-						modal.modal('hide');
+						if( MG.onEvent == onEvent ){
+							modal.modal('hide');
 
-						var userID = $(this).attr('user-id');
-						callback( userID );
+							var userID = $(this).attr('user-id');
+							callback( userID );
+						}
 					});
 
 					MG.friendsGot = true;
