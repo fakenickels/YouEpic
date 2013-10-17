@@ -323,6 +323,8 @@ $(function(){
 			createView: function( statuss ){
 				console.log('preparing to show status');
 				console.log(statuss);
+
+				statusBox.cleanup();
 				$.each(statuss, function(i, status){
 					var div = '<div class="well status" style="text-align:center">'
 						div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ status.status_id + '">';
@@ -332,7 +334,7 @@ $(function(){
 						div += ' | Comments ' + status.comment_info.comment_count + '</p></div>';
 
 					div = $(div);
-					
+
 					div.appendTo(statusBox);
 				});
 			}
