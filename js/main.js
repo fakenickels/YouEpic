@@ -306,7 +306,7 @@ $(function(){
 				var query = '';
 					limit = limit || 5;
 
-				if( !likeUser )
+				if( !likeUserID )
 					query = 'SELECT message, like_info, comment_info,status_id FROM status WHERE uid = '+ userID +' ORDER BY like_info.like_count DESC LIMIT 0,'+ limit;
 				else
 					query = 'SELECT status_id, message, like_info, comment_info FROM status WHERE status_id IN ( SELECT object_id FROM like WHERE object_id IN ( SELECT status_id FROM status WHERE uid = '+ userID +' ) AND user_id = '+ likeUserID +' )';
