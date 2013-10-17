@@ -332,7 +332,7 @@ $(function(){
 						div += ' | Comments ' + status.comment_info.comment_count + '</p></div>';
 
 					div = $(div);
-
+					
 					div.appendTo(statusBox);
 				});
 			}
