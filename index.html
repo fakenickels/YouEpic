@@ -46,13 +46,11 @@
 					<p>**Se você tiver algo em torno de 1000 amigos, a busca pode demorar uns 3s</p>
 				</div>
 				<div class='modal-body'>
+					<input type='text' class='form-control input-lg' id='friend-search' placeholder='Pesquisar amigo...'/>
 					<div class='pull-right'> 
-						<input type='text' class='form-control input-lg' id='friend-search' placeholder='Pesquisar amigo...'/>
-
 						<div class='progress-bar progress-bar-danger' id='friend-search-loading-bar' role='progressbar' style='width:100%'>
 							Carregando seus amigos... (calma, que é só pra amostrar aqui!)
 						</div>
-
 					</div><br>
 					<div class='btn-group-vertical' id='friends-thumbs'>
 					</div>
@@ -65,10 +63,11 @@
 
 		<div class='site-name jumbotron'>
 			<h1>Lek Gaiato <small>beta</small></h1>
+			<p class='lead'>Stalkeando fácil</p>
 		</div>
 
 		<div class='notices alert alert-success'>
-			<b>Bem-vindo!</b> (essa box é usada para noticar coisas)
+			<b>Bem-vindo!</b> (essa box é usada para noticar coisas).
 		</div>
 		
 		<div class='tabs'>
@@ -125,6 +124,10 @@
 						</li>						
 					</ul>
 				</li>				
+				
+				<li>
+					<a href="#friend-feed" data-toggle='tab'>Ver feed de um amigo</a>
+				</li>
 
 				<li>
 					<a href='#help' data-toggle='tab'>
@@ -214,6 +217,11 @@
 					<div class='comments well' style='text-align:center'>
 					  <div class="fb-comments" data-href="http://grsabreu.github.com/YouEpic" data-width="470" mobile='auto-detect'></div>
 					</div>
+					<hr>
+					<h1>O que vem por ai</h1>
+						<p class='lead'>Mais e mais ferramentas pra stalkear 3:)
+						</p>
+						<p></p>
 				</div>				
 			</div>
 		</div>
@@ -221,7 +229,7 @@
 		<div id='comments-box'></div>
 	</div>
 
-<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://code.jquery.com/jquery.min.js"></script>
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src='js/main.js'></script>	
 <script>

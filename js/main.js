@@ -1,18 +1,16 @@
 $(function(){
 	//TODO: Implement the resource that allows user filter friends blahblah
-		var form = $('#urls-form'), 
-			inputsField = $('#inputs-field'),
-			commentsBox = $('#comments-box'),
-			photosBox = $('#photos-watcher-content'),
-			statusBox = $('#status-watcher-content'),
-			actionBtn = $('button[type=submit]', form),
-			friendsThumbsContainer = $('#friends-thumbs'),
-			friendsThumbs,
-			noticeBox = $('div.notices'),
-			modal = $('#select-friend-box'),
-			totalInputs = 1;
-
-	console.log(actionBtn)
+	var form = $('#urls-form'), 
+		inputsField = $('#inputs-field'),
+		commentsBox = $('#comments-box'),
+		photosBox = $('#photos-watcher-content'),
+		statusBox = $('#status-watcher-content'),
+		actionBtn = $('button[type=submit]', form),
+		friendsThumbsContainer = $('#friends-thumbs'),
+		friendsThumbs,
+		noticeBox = $('div.notices'),
+		modal = $('#select-friend-box'),
+		totalInputs = 1;
 
 	// MeninoGaiato
 	var MG = {
@@ -22,43 +20,6 @@ $(function(){
 		init: function(){
 			// #comments-watcher
 			// TODO: Add #comments to shared
-			$('#urls-form').submit(function(e){
-				e.preventDefault();
-
-				actionBtn.addClass('disabled').text('Aguarde...');
-
-				MG.forceLogin(function( response ){
-					console.log('forceLogin called');
-					if( response == 'ok' ){
-
-						commentsBox.cleanup();
-						var comments_urls = inputsField.find('input').vals(), 
-							total = urls.length-1,
-							posts = [];
-
-
-						$.each(comments_urls, function(i, url){
-							var commentID = MG.parseObjID(url), 
-								arrForThis;
-
-							//TODO: Check a other user [user friend] comments too 
-							console.log('preparing to get comment ' + commentID);
-							MG.getComment(urlID, null, function(data){
-								console.log('parsing comments ' + commentID, 'index ' + i)
-								arrForThis = data;
-								arrForThis.urlID = urlID;
-
-								posts.push( arrForThis );
-								// At last, can show user comments [because AJAX can be slooow]
-								if( i == total){
-									MG.showComments( posts );
-									actionBtn.toggleClass('disabled').text('Pronto');
-								}
-							});
-						})
-					}
-				});
-			});
 
 			$('#add-url').click(function(){
 				MG.addInput();
@@ -156,7 +117,7 @@ $(function(){
 				$.each(post, function( i, comment){
 					var div = '<div class="comment well">';
 						div += '<h3>' + comment.text + '</h3>';
-						div += '<p class="lead">'+ comment.likes +' Likes</p>';
+						div += '<hr/><p class="lead">'+ comment.likes +' Likes</p>';
 						div += '<p class="lead">'+ comment.comment_count +'  replies</p>';
 						div += '</div>';
 
@@ -213,7 +174,7 @@ $(function(){
 
 						MG.getFriendID(function( likeUserID, likeUserName ){
 							MG[fbObject].setAllToUser( MG.curUserID, likeUserID );
-							noticeBox.html('Você está vendo as fotos que ' + likeUserName + ' curtiu');
+							noticeBox.html('Você está vendo os status/fotos que ' + likeUserName + ' curtiu');
 						}, 'filter-friend-' + fbObject);
 					});					
 				});
@@ -278,12 +239,12 @@ $(function(){
 				$.each( photos, function(i, photo){
 					var div = '<div class="photo well" style="text-align:center">';
 						div += '<a href="' + photo.link + '">';
-						div += '<img src="'+ photo.src_big +'" class="img-thumbnail"/></a>'
+						div += '<img src="'+ photo.src_big +'" class="img-thumbnail"/></a><hr/>'
 						
 						if( photo.caption )
-							div += '<p class="lead">"' + photo.caption.replace('\n', '<br>') + '</p>';
+							div += '<p class="lead caption">"' + photo.caption.replace('\n', '<br>') + '</p>';
 						
-						div += '<p class="lead">Likes ' + photo.like_info.like_count + ' | Comments ' + photo.comment_info.comment_count;
+						div += '<p class="lead counter">Likes ' + photo.like_info.like_count + ' | Comments ' + photo.comment_info.comment_count;
 						div += '</p>'
 						div += '</div>';
 
@@ -329,7 +290,7 @@ $(function(){
 					var div = '<div class="well status" style="text-align:jusfify">'
 						div += '<h3><a href="https://facebook.com/'+ MG.curUserID +'/posts/'+ status.status_id + '">';
 						div += status.message.replace('\n', '<br>');
-						div += '</a></h3>';
+						div += '</a></h3><hr/>';
 						div += '<p class="lead"> Likes '+ status.like_info.like_count;
 						div += ' | Comments ' + status.comment_info.comment_count + '</p></div>';
 
@@ -338,6 +299,10 @@ $(function(){
 					div.appendTo(statusBox);
 				});
 			}
+		},
+
+		comments: {
+
 		},
 
 		checkLogin: function(fns){
