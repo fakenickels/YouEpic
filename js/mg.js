@@ -194,7 +194,7 @@ $(function(){
 				$('#'+ objName +'-watcher .progress').toggleClass('active');
 				MG.forceLogin(function( response ){
 					if( response == 'ok' ){
-
+						NProgress.inc();
 						MG[ objName ].get(limit, function(data){
 							MG[ objName ].createView(data, function(){
 								$( '#' + objName + '-watcher .progress' ).toggleClass('active');
@@ -202,6 +202,7 @@ $(function(){
 								noticeBox
 									.html('Que tal compartilhar o <b>seu</b> rank com seus amigos? Aqui está o link <b>http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() + '</b>');								
 								});
+							NProgress.done(true)
 						}, userID, likeUserID);
 
 					} else {
@@ -209,6 +210,7 @@ $(function(){
 							.fadeOut( 50 )
 							.fadeIn( 100 )
 							.html('<b>Ahh lek!</b> Alguma coisa deu errado, tente recarregar a página e tente de novo.');
+						NProgress.done(true);
 					}
 				});
 			}
