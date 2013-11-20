@@ -1,10 +1,13 @@
+/*! YouEpic - v0.1.0 - 2013-11-20
+* http://PROJECT_WEBSITE/
+* Copyright (c) 2013 Gabriel Rubens; Licensed MIT */
 @import url(http://fonts.googleapis.com/css?family=Lato:300,400,700);
 body {
   font-family: 'Lato', 'Arial', sans-serif;
   background-color: #eeeeee; }
 
 div.notices {
-  background-color: #bf2c6c;
+  background-color: #15947b;
   color: #fff;
   text-shadow: 0 0 1px #000;
   border-radius: 0; }
@@ -35,9 +38,10 @@ div.notices {
 div.site-name {
   background-color: #d9534f;
   color: #fff;
+  margin-top: 15px;
   border-radius: 0 !important; }
   div.site-name small {
-    color: #d9534f;
+    color: #eee;
     text-shadow: 0 0 1px #000; }
 
 div.tabs #tab-menu {
@@ -93,3 +97,84 @@ div.status, div.status a, div.photo {
   div.tabs div.content {
     width: 100%;
     float: none; } }
+
+#nprogress {
+  pointer-events: none;
+  -webkit-pointer-events: none;
+}
+
+#nprogress .bar {
+  background: #c30;
+
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+}
+
+/* Fancy blur effect */
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px #c30, 0 0 5px #c30;
+  opacity: 1.0;
+
+  -webkit-transform: rotate(3deg) translate(0px, -4px);
+  -moz-transform: rotate(3deg) translate(0px, -4px);
+  -ms-transform: rotate(3deg) translate(0px, -4px);
+  -o-transform: rotate(3deg) translate(0px, -4px);
+  transform: rotate(3deg) translate(0px, -4px);
+}
+
+/* Remove these to get rid of the spinner */
+#nprogress .spinner {
+  display: block;
+  position: fixed;
+  z-index: 100;
+  top: 15px;
+  right: 15px;
+}
+
+#nprogress .spinner-icon {
+  width: 14px;
+  height: 14px;
+
+  border:  solid 2px transparent;
+  border-top-color:  #c30;
+  border-left-color: #c30;
+  border-radius: 10px;
+
+  -webkit-animation: nprogress-spinner 400ms linear infinite;
+  -moz-animation:    nprogress-spinner 400ms linear infinite;
+  -ms-animation:     nprogress-spinner 400ms linear infinite;
+  -o-animation:      nprogress-spinner 400ms linear infinite;
+  animation:         nprogress-spinner 400ms linear infinite;
+}
+
+@-webkit-keyframes nprogress-spinner {
+  0%   { -webkit-transform: rotate(0deg);   transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-moz-keyframes nprogress-spinner {
+  0%   { -moz-transform: rotate(0deg);   transform: rotate(0deg); }
+  100% { -moz-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-o-keyframes nprogress-spinner {
+  0%   { -o-transform: rotate(0deg);   transform: rotate(0deg); }
+  100% { -o-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-ms-keyframes nprogress-spinner {
+  0%   { -ms-transform: rotate(0deg);   transform: rotate(0deg); }
+  100% { -ms-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@keyframes nprogress-spinner {
+  0%   { transform: rotate(0deg);   transform: rotate(0deg); }
+  100% { transform: rotate(360deg); transform: rotate(360deg); }
+}
+
