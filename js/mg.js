@@ -5,6 +5,7 @@ $(function(){
 		commentsBox = $('#comments-box'),
 		photosBox = $('#photos-watcher-content'),
 		statusBox = $('#status-watcher-content'),
+		feedBox = $('#feed-watcher-content'),
 		actionBtn = $('button[type=submit]', form),
 		friendsThumbsContainer = $('#friends-thumbs'),
 		friendsThumbs,
@@ -162,7 +163,7 @@ $(function(){
 
 					$( selector ).bind('click', function(){
 						NProgress.inc();
-						MG.onEvent = 'friend-' + fbObject;
+						MG.curEvent = 'friend-' + fbObject;
 
 						MG.getFriendID(function( userID ){
 							MG[fbObject].setAllToUser( userID );
@@ -174,7 +175,7 @@ $(function(){
 
 					// Filter a friend who likes {fbObject} of current user
 					$('#'+ fbObject +'-watcher a.friend-filter-btn').bind('click', function(){
-						MG.onEvent = 'filter-friend-' + fbObject;
+						MG.curEvent = 'filter-friend-' + fbObject;
 
 						NProgress.inc();
 						MG.getFriendID(function( likeUserID, likeUserName ){
@@ -351,6 +352,7 @@ $(function(){
 				}
 				else {
 					if( fns.error ) fns.error();
+					else alert('Não foi possível conectar com sua conta do Facebook.')
 				}
 			})
 		},
@@ -387,12 +389,12 @@ $(function(){
 		// Controls the modal. When user click in a box, returns the id of selected friend
 		friendsGot: false,
 
-		onEvent: '',
+		curEvent: '',
 
 		// MG#getFriendID
 		// callback: will receive the UID 
-		// onEvent: MG event
-		getFriendID: function( callback, onEvent ){
+		// curEvent: MG event
+		getFriendID: function( callback, curEvent ){
 			$('#select-friend-box').modal('show');
 
 			console.log('invoking FB#api. Waiting data...');
@@ -421,7 +423,7 @@ $(function(){
 				friendsThumbs.bind('click', bindEvent);
 
 			function bindEvent(){
-				if( MG.onEvent == onEvent ){
+				if( MG.curEvent == curEvent ){
 					modal.modal('hide');
 
 					var userID = $(this).attr('user-id'),
