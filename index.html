@@ -24,6 +24,13 @@
 	});
 
 	// Additional initialization code such as adding Event Listeners goes here
+
+	FB.Event.subscribe('auth.statusChange', function(){
+		window.location.reload();
+	});
+	FB.Event.subscribe('auth.authResponseChange', function(){
+		window.location.reload();
+	})
   };
 
   // Load the SDK asynchronously
@@ -63,7 +70,7 @@
 
 		<div class='site-name jumbotron'>
 			<h1>Lek Gaiato <small>beta</small></h1>
-			<p class='lead'>Stalkeando fácil</p>
+			<p class='lead'>Ferramentas quase superflúas para o seu Facebook</p>
 		</div>
 
 		<div class='notices alert alert-success'>
@@ -126,7 +133,9 @@
 				</li>				
 				
 				<li>
-					<a href="#friend-feed" data-toggle='tab'>Ver feed de um amigo</a>
+					<a href="#friend-feed" data-toggle='tab'>
+						<i class='glyphicon glyphicon-book'></i> Ver feed de um amigo
+					</a>
 				</li>
 
 				<li>

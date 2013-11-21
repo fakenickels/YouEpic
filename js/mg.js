@@ -367,7 +367,7 @@ $(function(){
 					FB.login(function(){
 						// Reload it
 						MG.checkLogin(fns);
-					}, {scope: 'user_photos,user_videos,user_status,friends_photos'});
+					}, {scope: 'user_photos,user_videos,user_status,friends_photos,friends_status'});
 				}				
 			};
 
