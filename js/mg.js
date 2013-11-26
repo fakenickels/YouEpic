@@ -15,6 +15,8 @@ $(function(){
 
 	// MeninoGaiato
 	var MG = {
+
+		scope: 'user_photos,user_status,friends_photos,friends_status',
 		
 		curUserID: undefined,
 
@@ -195,16 +197,9 @@ $(function(){
 				$('#'+ objName +'-watcher .progress').toggleClass('active');
 				MG.forceLogin(function( response ){
 					if( response == 'ok' ){
-						NProgress.inc();
-						MG[ objName ].get(limit, function(data){
-							MG[ objName ].createView(data, function(){
-								$( '#' + objName + '-watcher .progress' ).toggleClass('active');
 
-								noticeBox
-									.html('Que tal compartilhar o <b>seu</b> rank com seus amigos? Aqui está o link <b>http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() + '</b>');								
-								});
-							NProgress.done(true)
-						}, userID, likeUserID);
+						NProgress.inc();
+						MG.shared.get( userID, likeUserID, objName, limit );
 
 					} else {
 						noticeBox
@@ -214,6 +209,23 @@ $(function(){
 						NProgress.done(true);
 					}
 				});
+			},
+
+			get: function( userID, likeUserID, objName, limit ){
+				MG[ objName ].get(limit, function(data){
+					if( data.error ){
+						(noticeBox)
+							.html('Hmmm... alguma coisa deu errada, notifique-me no Facebook (grubens1) sobre o erro');
+					} else {
+						MG[ objName ].createView(data, function(){
+							$( '#'+ objName + '-watcher .progress' ).toggleClass('active');
+
+							(noticeBox)
+								.html('Que tal compartilhar o <b>seu</b> rank com seus amigos? Aqui está o link <b>http://grsabreu.github.io/YouEpic/?u=' + FB.getUserID() + '</b>');								
+						});
+					}
+					NProgress.done(true)
+				}, userID, likeUserID);
 			}
 		},
 
@@ -369,7 +381,7 @@ $(function(){
 					FB.login(function(){
 						// Reload it
 						MG.checkLogin(fns);
-					}, {scope: 'user_photos,user_videos,user_status,friends_photos,friends_status'});
+					}, {scope: MG.scope});
 				}				
 			};
 
@@ -466,12 +478,12 @@ $(function(){
 				return false; // nothing in the URL
 		},
 
-		getFriendFeed: function(){
+		getFriendFeed: function( fn ){
 			MG.getFriendID(function( uid, userName ){
 				console.log('MG#getFriendFeed initializing');
 
-				FB.api('/' + uid + '/feed', function(){
-					
+				FB.api('/' + uid + '/feed', function( data ){
+					fn( data )
 				})
 			})
 		}
